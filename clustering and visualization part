@@ -1,0 +1,69 @@
+library(data.table)
+library(dplyr)
+library(writexl)
+library(dplyr)
+library(cluster)
+
+
+#set directory and read,name and merge your blast scores
+setwd("C:/Users/MSI/Desktop/aa")
+
+files = list.files(path="C:/Users/MSI/Desktop/aa",pattern = "csv")
+
+for(i in 1:length(files))
+{
+  data <- fread(files[i], header=T)
+  
+  # Merge
+  mydata <- merge(celeg, chimp, by="HUMAN", all.x=TRUE)
+  
+  rm(data)
+}
+
+mydata = zz
+
+#make NA values "0"
+
+zz[is.na(zz)] = 0
+
+#write your merged results to save them
+
+write_xlsx(zz,"C:\\Users\\MSI\\Desktop\\zzz.xlsx")
+
+
+#since visualization and calcultaion is impossible for all,
+#take some of the data(first 300 for this case)
+
+zz300 = zz[1:300,]
+
+#make all values numeric
+
+zz300[,2:10] = as.numeric(as.character(zz300[,2:10]))
+
+#divide all bit scores by human bit score for normalization
+
+normalized = zz300 / zz300$human
+
+#scale data to mean=0, sd=1 and convert to matrix
+mtscaled <- as.matrix(scale(zz300[,2:10]))
+mtscaled [is.nan(mtscaled)] = 0
+
+
+# create heatmap and don't reorder columns
+heatmap(mtscaled, scale='none')
+
+# cluster rows
+hc.rows <- hclust(dist(mtscaled))
+plot(hc.rows)
+
+# transpose the matrix and cluster columns
+hc.cols <- hclust(dist(t(mtscaled)))
+
+# draw heatmap for first cluster
+heatmap(mtscaled[cutree(hc.rows,k=1)==1,], Colv=as.dendrogram(hc.cols), scale='none')
+
+# draw heatmap for other clusters
+heatmap(mtscaled[cutree(hc.rows,k=30)==1,], Colv=as.dendrogram(hc.cols), scale='none')
+
+rownames(mtscaled) <- zz300$GENES
+
