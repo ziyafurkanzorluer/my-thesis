@@ -45,25 +45,25 @@ zz300[,2:10] = as.numeric(as.character(zz300[,2:10]))
 normalized = zz300 / zz300$human
 
 #scale data to mean=0, sd=1 and convert to matrix
-mtscaled <- as.matrix(scale(zz300[,2:10]))
-mtscaled [is.nan(mtscaled)] = 0
+scaled <- as.matrix(scale(zz300[,2:10]))
+scaled [is.nan(scaled)] = 0
 
 
 # create heatmap and don't reorder columns
-heatmap(mtscaled, scale='none')
+heatmap(scaled, scale='none')
 
 # cluster rows
-hc.rows <- hclust(dist(mtscaled))
+hc.rows <- hclust(dist(scaled))
 plot(hc.rows)
 
 # transpose the matrix and cluster columns
-hc.cols <- hclust(dist(t(mtscaled)))
+hc.cols <- hclust(dist(t(scaled)))
 
 # draw heatmap for first cluster
-heatmap(mtscaled[cutree(hc.rows,k=1)==1,], Colv=as.dendrogram(hc.cols), scale='none')
+heatmap(scaled[cutree(hc.rows,k=1)==1,], Colv=as.dendrogram(hc.cols), scale='none')
 
 # draw heatmap for other clusters
-heatmap(mtscaled[cutree(hc.rows,k=30)==1,], Colv=as.dendrogram(hc.cols), scale='none')
+heatmap(scaled[cutree(hc.rows,k=30)==1,], Colv=as.dendrogram(hc.cols), scale='none')
 
-rownames(mtscaled) <- zz300$GENES
+rownames(scaled) <- zz300$GENES
 
